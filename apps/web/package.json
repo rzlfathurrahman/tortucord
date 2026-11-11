@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.6.1",
+    "@modelcontextprotocol/sdk": "^1.32.0",
     "@tortuga/config": "workspace:*",
     "@tortuga/database": "workspace:*",
     "@tortuga/mcp": "workspace:*",
