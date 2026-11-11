@@ -1,0 +1,77 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnpm-store/
+**/.pnpm-store/
+
+# Environment and secrets (Never commit secrets!)
+.env
+.env.*
+!.env.example
+*.local
+
+# Next.js build output
+.next/
+**/.next/
+out/
+**/out/
+
+# Build artifacts & compilation output
+dist/
+**/dist/
+build/
+**/build/
+.turbo/
+**/.turbo/
+coverage/
+**/coverage/
+
+# TypeScript build info
+*.tsbuildinfo
+**/*.tsbuildinfo
+
+# Database & SQLite files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sql.gz
+*.sql.dump
+
+# Logs & Debugging
+*.log
+**/*.log
+logs/
+**/logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Docker local volumes / mounts
+postgres_data/
+redis_data/
+postgres_dev_data/
+redis_dev_data/
+
+# OS metadata
+.DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs and Editors
+.idea/
+**/.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.swp
+*.swo
+*~

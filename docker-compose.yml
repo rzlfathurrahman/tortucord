@@ -1,0 +1,113 @@
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tortuga-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tortuga}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tortugapassword}
+      POSTGRES_DB: ${POSTGRES_DB:-tortugadb}
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c effective_cache_size=768MB
+      -c work_mem=16MB
+      -c maintenance_work_mem=64MB
+      -c min_wal_size=100MB
+      -c max_wal_size=1GB
+      -c checkpoint_completion_target=0.9
+      -c max_connections=200
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tortuga} -d ${POSTGRES_DB:-tortugadb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - tortuga-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: tortuga-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save 60 1 --loglevel warning
+    ports:
+      - "127.0.0.1:6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+    networks:
+      - tortuga-network
+
+  bot:
+    build:
+      context: .
+      dockerfile: apps/bot/Dockerfile
+    container_name: tortuga-bot
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tortuga}:${POSTGRES_PASSWORD:-tortugapassword}@postgres:5432/${POSTGRES_DB:-tortugadb}?schema=public
+      REDIS_URL: redis://redis:6379
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+      DISCORD_PUBLIC_KEY: ${DISCORD_PUBLIC_KEY}
+      DEFAULT_PREFIX: ${DEFAULT_PREFIX:-!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tortuga-network
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: tortuga-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_BIND:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tortuga}:${POSTGRES_PASSWORD:-tortugapassword}@postgres:5432/${POSTGRES_DB:-tortugadb}?schema=public
+      REDIS_URL: redis://redis:6379
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-super_secret_session_key_please_change_me}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      NEXT_PUBLIC_DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tortuga-network
+
+volumes:
+  postgres_data:
+    name: tortuga_postgres_data
+  redis_data:
+    name: tortuga_redis_data
+
+networks:
+  tortuga-network:
+    name: tortuga_network
+    driver: bridge

@@ -1,0 +1,46 @@
+
+# Lightweight compose file for local development (starts DB & Redis only)
+# Run with: docker compose -f docker-compose.dev.yml up -d
+# Then run: pnpm dev on your host machine!
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tortuga-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tortuga}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tortugapassword}
+      POSTGRES_DB: ${POSTGRES_DB:-tortugadb}
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tortuga} -d ${POSTGRES_DB:-tortugadb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+
+  redis:
+    image: redis:7-alpine
+    container_name: tortuga-redis-dev
+    restart: unless-stopped
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru --loglevel warning
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 2s
+
+volumes:
+  postgres_dev_data:
+    name: tortuga_postgres_dev_data
+  redis_dev_data:
+    name: tortuga_redis_dev_data
