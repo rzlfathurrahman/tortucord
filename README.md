@@ -1,9 +1,9 @@
 <div align="center">
 
-# 🐢 Tortuga
+# 🐢 TortuCord
 
-**The 100% Free & Open-Source Discord Bot & Management Dashboard**  
-*Menggabungkan fitur premium Carl-bot & MEE6 — tanpa paywall, tanpa langganan, gratis selamanya.*
+**The 100% Free & Open-Source Discord Bot & Web Management Dashboard Platform**  
+*Full-featured alternative to Carl-bot & MEE6 — zero paywalls, zero subscriptions, free forever under MIT License.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Discord.js](https://img.shields.io/badge/Discord.js-v14-5865F2.svg)](https://discord.js.org/)
@@ -11,17 +11,19 @@
 [![Prisma](https://img.shields.io/badge/Prisma-PostgreSQL-3982CE.svg)](https://www.prisma.io/)
 [![Turborepo](https://img.shields.io/badge/Monorepo-Turborepo-EF4444.svg)](https://turbo.build/)
 
+🌐 **Official Landing & Docs Repo**: [rzlfathurrahman/tortucord-landing](https://github.com/rzlfathurrahman/tortucord-landing)
+
 </div>
 
 ---
 
-## 🌟 Mengapa Tortuga?
+## 🌟 Mengapa TortuCord?
 
 Bot populer seperti **Carl-bot** dan **MEE6** mengunci fitur-fitur esensial komunitas di balik langganan **Premium ($5 - $25/bulan)** — mulai dari Auto-Role, Onboarding, Sticky Messages, Leveling, hingga Drama Watcher.
 
-**Tortuga** hadir sebagai platform *self-hostable* mandiri berkelas enterprise dengan **seluruh fitur premium terbuka penuh dan gratis**:
+**TortuCord** hadir sebagai platform *self-hostable* mandiri berkelas enterprise dengan **seluruh fitur premium terbuka penuh dan gratis**:
 
-| Fitur Utama | Carl-bot | MEE6 | 🐢 **Tortuga (Open-Source)** |
+| Fitur Utama | Carl-bot | MEE6 | 🐢 **TortuCord (Open-Source)** |
 | :--- | :---: | :---: | :---: |
 | **Auto-Role on Join** | Limit | 🔒 **Berbayar ($12/bln)** | **✅ Gratis & Unlimited** (Human & Bot roles) |
 | **Welcome & Onboarding GUI** | Parsial | 🔒 Sebagian Berbayar | **✅ Gratis** (Embed + DM + Live Simulator) |
@@ -37,37 +39,36 @@ Bot populer seperti **Carl-bot** dan **MEE6** mengunci fitur-fitur esensial komu
 
 ---
 
-## 🎨 Linear / Raycast Aesthetic (Zero AI-Slop)
+## 🎨 Linear / Raycast Aesthetic Dashboard
 
-Dashboard Tortuga dirancang dengan standar desain engineering modern:
-- **Single Unified Topbar**: Navigasi breadcrumb presisi (`Tortuga / [Server ▾] / Halaman`) dengan status Gateway live dan profil Discord — tanpa topbar dobel.
+Dashboard TortuCord dirancang dengan standar desain engineering modern:
+- **Single Unified Topbar**: Navigasi breadcrumb presisi (`TortuCord / [Server ▾] / Halaman`) dengan status Gateway live dan profil Discord.
 - **Dark Obsidian Canvas**: Palet matte gelap (`#08090d`), layer panel yang rapi (`#0e111a`), dan border ultra-crisp `border-white/[0.08]`.
-- **High Data-Density**: Tata letak terstruktur tanpa badge warna-warni yang berlebihan.
-- **Pixel-Perfect Discord Simulator**: Pratinjau pesan sambutan dan embed langsung sesuai tampilan aplikasi Discord asli.
+- **Pixel-Perfect Discord Simulator**: Pratinjau pesan sambutan dan embed interaktif langsung sesuai tampilan aplikasi Discord asli.
 
 ---
 
 ## 🏗️ Arsitektur Monorepo
 
-Dibangun menggunakan **Turborepo** dan **pnpm workspaces**:
+Repository ini fokus pada **Engine Bot & Web Dashboard Control Panel**. Landing page & dokumentasi publik dipisahkan ke repo [`tortucord-landing`](https://github.com/rzlfathurrahman/tortucord-landing).
 
 ```
-tortuga/
+tortucord/
 ├── apps/
 │   ├── bot/                 # Discord Bot Core (Discord.js v14)
-│   │   ├── src/events/      # Gateway listeners (guildMemberAdd, guildMemberRemove, messageCreate, reaction, voice)
-│   │   ├── src/commands/    # Slash & prefix commands (/warn, /timeout, /ban, /purge, /reactionrole, dll)
-│   │   ├── src/modules/     # automod, leveling, reaction-roles, sticky, starboard, suggestions, logging
+│   │   ├── src/events/      # Gateway listeners (guildMemberAdd, reaction, voice, automod)
+│   │   ├── src/commands/    # Slash commands (/warn, /timeout, /ban, /purge, /reactionrole, dll)
+│   │   ├── src/modules/     # automod, leveling, reaction-roles, sticky, starboard, suggestions, tickets
 │   │   └── src/index.ts
-│   └── web/                 # Web Dashboard (Next.js 15 App Router + Tailwind CSS)
-│       ├── src/app/         # Dashboard pages, guild settings, onboarding, roles, embeds, public leaderboard
-│       ├── src/components/  # Unified Topbar, Linear Sidebar, Discord Simulator
+│   └── web/                 # Web Dashboard & Discord OAuth (Next.js 15 App Router)
+│       ├── src/app/         # Dashboard control panel, guild settings, roles, embeds
+│       ├── src/components/  # Unified Topbar, Sidebar, Discord Simulator
 │       └── src/lib/         # Discord REST client, session auth, types
 ├── packages/
 │   ├── config/              # Shared enums, permissions, intents, and constants
 │   ├── database/            # Prisma ORM Schema & PostgreSQL Client
 │   └── tagscript/           # Sandboxed TagScript parser ({user.mention}, {server.name}, {memberCount})
-├── docker-compose.yml       # Full-stack Docker (PostgreSQL 5434, Redis 6380, Bot, Web)
+├── docker-compose.yml       # Full-stack Docker (PostgreSQL 5434, Redis 6380, Bot, Web Dashboard)
 └── turbo.json
 ```
 
@@ -77,12 +78,12 @@ tortuga/
 
 ### Cara 1: Menggunakan Docker Compose (Satu Perintah Siap Pakai)
 
-Tortuga sudah dilengkapi konfigurasi Docker lengkap (Postgres + Redis + Bot + Web Standalone):
+TortuCord sudah dilengkapi konfigurasi Docker lengkap (Postgres + Redis + Bot + Web Standalone):
 
 1. **Clone repository dan salin environment**:
    ```bash
    git clone https://github.com/rzlfathurrahman/tortucord.git
-   cd tortuga
+   cd tortucord
    cp .env.example .env
    ```
 
@@ -124,8 +125,8 @@ Tortuga sudah dilengkapi konfigurasi Docker lengkap (Postgres + Redis + Bot + We
 
 3. **Sinkronisasi Database**:
    ```bash
-   pnpm db:generate
-   pnpm db:push
+   pnpm --filter @tortuga/database run generate
+   pnpm --filter @tortuga/database run push
    ```
 
 4. **Jalankan Bot dan Web secara bersamaan**:
@@ -135,17 +136,12 @@ Tortuga sudah dilengkapi konfigurasi Docker lengkap (Postgres + Redis + Bot + We
 
 ---
 
-## 🛠️ Fitur yang Siap Digunakan dari Dashboard
+## 💖 Sponsor & Support
 
-- **👋 Onboarding & Welcome**: Pengaturan pesan sambutan publik, pesan perpisahan (goodbye), pesan privat DM ke member baru, serta template dinamis (`{user.mention}`, `{server.name}`, `{memberCount}`).
-- **⚡ Auto-Role on Join**: Berikan role otomatis secara instan kepada member baru atau bot yang baru masuk server.
-- **🛡️ Role Hierarchy Manager**: Tampilan visual urutan hierarki role Discord, pengecekan permission (Admin, Manage Roles, Moderate), serta indikator keamanan batas role bot.
-- **🎭 Reaction Roles**: Pembuatan prompt tombol interaktif Discord yang langsung terkirim ke channel pilihan.
-- **🤖 AutoMod & Drama Watcher**: Rate-limiting anti-spam dengan Redis, blokir invite Discord, proteksi mass mention, filter kata terlarang, dan review queue keributan.
-- **📌 Sticky Messages**: Pesan penting yang selalu otomatis berada di paling bawah channel chat.
-- **🎨 Visual Embed Builder**: Desain pengumuman dan tata tertib server dengan live preview, lalu kirim ke channel dengan satu klik tombol.
-- **🏆 Leveling & Public Leaderboard**: Penghitungan XP chat/voice otomatis dengan halaman leaderboard publik yang siap dibagikan ke member.
-- **📜 Audit Weblogs**: Rekap seluruh tindakan moderasi dan perubahan server secara permanen di database PostgreSQL.
+TortuCord adalah proyek open-source independen 100% gratis tanpa fitur berbayar. Dukung pengembangan TortuCord melalui:
+- **Patreon**: [patreon.com/rzlfathurrahman](https://patreon.com/rzlfathurrahman)
+- **Ko-fi**: [ko-fi.com/rzlfathurrahman](https://ko-fi.com/rzlfathurrahman)
+- **Saweria (QRIS / E-Wallet)**: [saweria.co/rzlfathurrahman](https://saweria.co/rzlfathurrahman)
 
 ---
 
