@@ -59,7 +59,8 @@ export async function POST(
         // Category match: 2 points
         if (catLower.includes(token)) score += 2;
         // Content occurrence: 1 point per match (up to 5)
-        const regex = new RegExp(token, 'gi');
+        const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escapedToken, 'gi');
         const matches = contentLower.match(regex);
         if (matches) {
           score += Math.min(matches.length, 5);
