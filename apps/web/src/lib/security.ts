@@ -264,146 +264,48 @@ export async function parseSafeJson<T = any>(
 }
 
 /**
- * Normalizes input division to standard allowed name
+ * Validates external outbound URLs to prevent SSRF (Server-Side Request Forgery).
+ * Rejects private, loopback, internal IP ranges and dangerous URL schemes.
  */
-export function normalizeDivision(input: string): AllowedDivision | null {
-  if (!input) return null;
-  const norm = input.trim().toLowerCase();
-
-  // Check exact alias
-  if (DIVISION_ALIASES[norm]) {
-    return DIVISION_ALIASES[norm];
-  }
-
-  // Check standard list
-  const standard = ALLOWED_DIVISIONS.find((d) => d.toLowerCase() === norm);
-  if (standard) return standard;
-
-  // Check partial match
-  for (const [key, val] of Object.entries(DIVISION_ALIASES)) {
-    if (norm.includes(key)) {
-      return val;
+export function isSafeOutboundUrl(urlString: string): boolean {
+  try {
+    const parsed = new URL(urlString);
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return false;
     }
-  }
 
-  return null;
-}
+    const hostname = parsed.hostname.toLowerCase();
 
-export interface ValidatedRegistrationData {
-  fullName: string;
-  idNumber: string;
-  school: string;
-  year: number;
-  batch: string;
-  division: AllowedDivision;
-  discordUsername: string | null;
-  isBotHoneypotTriggered: boolean;
-}
-
-/**
- * Validates and sanitizes registration input fields
- */
-export function validateRegistrationPayload(body: any): {
-  valid: boolean;
-  error?: string;
-  data?: ValidatedRegistrationData;
-} {
-  if (!body || typeof body !== 'object') {
-    return { valid: false, error: 'Data formulir tidak ditemukan.' };
-  }
-
-  // Anti-bot honeypot detection
-  const honeypot = body.website || body.hp_token || body.company_url || body.honeypot;
-  const isBotHoneypotTriggered = Boolean(honeypot && String(honeypot).trim().length > 0);
-
-  // Full Name: 2-100 characters, no dangerous symbols
-  const rawFullName = body.fullName || body.name;
-  const fullName = sanitizeString(rawFullName, 100);
-  if (!fullName || fullName.length < 2) {
-    return { valid: false, error: 'Nama Lengkap wajib diisi (minimal 2 karakter).' };
-  }
-
-  // NIS / NIM: 3-50 characters, alphanumeric, dots, dashes, slashes
-  const rawIdNumber = body.idNumber || body.nisNim || body.nis_nim;
-  const idNumber = sanitizeString(rawIdNumber, 50).toUpperCase();
-  if (!idNumber || idNumber.length < 3) {
-    return { valid: false, error: 'NIS / NIM wajib diisi (minimal 3 karakter).' };
-  }
-  if (!/^[A-Z0-9.\-\/ ]+$/.test(idNumber)) {
-    return { valid: false, error: 'NIS / NIM hanya boleh berisi huruf, angka, titik, atau strip.' };
-  }
-
-  // School / Institution: 2-150 characters
-  const rawSchool = body.school || body.asalSekolah || body.university;
-  const school = sanitizeString(rawSchool, 150).toUpperCase();
-  if (!school || school.length < 2) {
-    return { valid: false, error: 'Asal Sekolah / Universitas wajib diisi.' };
-  }
-
-  // Year: Integer between 2000 and 2050
-  const rawYear = parseInt(String(body.year || body.tahunMasuk || new Date().getFullYear()), 10);
-  if (isNaN(rawYear) || rawYear < 2000 || rawYear > 2050) {
-    return { valid: false, error: 'Tahun masuk tidak valid (rentang 2000 - 2050).' };
-  }
-
-  // Batch: 1-50 characters
-  const rawBatch = body.batch || body.batchMagang;
-  const batch = sanitizeString(rawBatch, 50).toUpperCase();
-  if (!batch) {
-    return { valid: false, error: 'Batch magang wajib diisi.' };
-  }
-
-  // Division: Must match one of the 5 allowed divisions
-  const rawDivision = body.division || body.role;
-  const division = normalizeDivision(String(rawDivision || ''));
-  if (!division) {
-    return {
-      valid: false,
-      error: `Pilihan divisi tidak valid. Pilih salah satu dari: ${ALLOWED_DIVISIONS.join(', ')}`,
-    };
-  }
-
-  // Discord Username: Optional, but if provided, validate standard discord username format
-  let discordUsername: string | null = null;
-  if (body.discordUsername) {
-    const rawDisc = sanitizeString(body.discordUsername, 40).replace(/^@/, '');
-    if (rawDisc) {
-      if (!/^[a-zA-Z0-9_.]+$/.test(rawDisc) || rawDisc.length < 2 || rawDisc.length > 32) {
-        return {
-          valid: false,
-          error: 'Format username Discord tidak valid (hanya huruf, angka, underscore, atau titik, 2-32 karakter).',
-        };
-      }
-      discordUsername = rawDisc;
+    // Rejection of loopback & internal domains
+    if (
+      hostname === 'localhost' ||
+      hostname.endsWith('.localhost') ||
+      hostname.endsWith('.internal') ||
+      hostname.endsWith('.local') ||
+      hostname.endsWith('.arpa') ||
+      hostname.endsWith('.test') ||
+      hostname === '127.0.0.1' ||
+      hostname === '0.0.0.0' ||
+      hostname === '::1'
+    ) {
+      return false;
     }
+
+    // Reject Private IPv4 ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16, 100.64.0.0/10)
+    const ipv4Match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (ipv4Match) {
+      const [b0, b1] = [parseInt(ipv4Match[1], 10), parseInt(ipv4Match[2], 10)];
+      if (b0 === 10) return false;
+      if (b0 === 127) return false;
+      if (b0 === 169 && b1 === 254) return false;
+      if (b0 === 172 && b1 >= 16 && b1 <= 31) return false;
+      if (b0 === 192 && b1 === 168) return false;
+      if (b0 === 100 && b1 >= 64 && b1 <= 127) return false; // Tailscale / CGNAT
+      if (b0 === 0) return false;
+    }
+
+    return true;
+  } catch {
+    return false;
   }
-
-  return {
-    valid: true,
-    data: {
-      fullName,
-      idNumber,
-      school,
-      year: rawYear,
-      batch,
-      division,
-      discordUsername,
-      isBotHoneypotTriggered,
-    },
-  };
-}
-
-/**
- * Masks sensitive names for public status responses to protect intern privacy from scrapers
- * e.g., "Rizal Fathurrahman" -> "R*** F***********"
- */
-export function maskName(fullName: string): string {
-  if (!fullName) return '***';
-  return fullName
-    .split(' ')
-    .map((word) => {
-      if (word.length <= 1) return word;
-      return word[0] + '*'.repeat(Math.max(1, word.length - 1));
-    })
-    .join(' ');
 }

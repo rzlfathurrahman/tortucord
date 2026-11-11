@@ -1,0 +1,38 @@
+name: Security & Anti-Malicious File Gatekeeper
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  gatekeeper:
+    name: Scan for Malicious Hooks, Secrets & Injections
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Block Rogue Agent Prompt & Workspace Injections
+        run: |
+          echo "Scanning for rogue agent instructions and hidden prompt injection files..."
+          BLOCKED_FILES=$(git diff --name-only origin/main HEAD 2>/dev/null || git ls-files | grep -iE "(^|/)(\.agent|\.agents|AGENTS\.md|CLAUDE\.md|\.claude|\.windsurf|\.cursorrules|\.cursor|\.vscode/.*\.sh|\.git/hooks)")
+          if [ -n "$BLOCKED_FILES" ]; then
+            echo "::error::Blocked files detected in repository or PR: $BLOCKED_FILES"
+            echo "Do not commit external agent instruction override files into TortuCord."
+            exit 1
+          fi
+          echo "No rogue agent overrides found."
+
+      - name: Audit Package Lifecycle Scripts (Pre/Postinstall Supply-Chain Guard)
+        run: |
+          echo "Checking for hidden lifecycle hooks in package.json files..."
+          HOOKS=$(grep -rnIE '"(preinstall|postinstall|prepublish|postpublish)"' **/package.json package.json 2>/dev/null || true)
+          if [ -n "$HOOKS" ]; then
+            echo "::error::Unauthorized npm lifecycle hook detected: $HOOKS"
+            exit 1
+          fi
+          echo "No unauthorized npm hooks found."

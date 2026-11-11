@@ -1,8 +1,8 @@
 {
-  "name": "tortuga",
+  "name": "tortucord",
   "version": "1.0.0",
   "private": true,
-  "description": "Open-Source Discord Bot & Web Dashboard clone of Carl-bot with full premium features",
+  "description": "Open-Source Discord Bot Platform & Web Management Dashboard",
   "author": "Open Source Community",
   "license": "MIT",
   "scripts": {
@@ -13,8 +13,6 @@
     "db:generate": "pnpm --filter @tortuga/database generate",
     "db:push": "pnpm --filter @tortuga/database push",
     "db:studio": "pnpm --filter @tortuga/database studio",
-    "deploy:dev": "bash scripts/deploy.sh",
-    "deploy:macmini": "bash scripts/deploy-macmini.sh",
     "mcp": "pnpm --filter @tortuga/mcp start"
   },
   "devDependencies": {
