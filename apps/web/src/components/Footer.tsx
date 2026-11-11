@@ -73,28 +73,43 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href={APP_CONFIG.discordSupportUrl}
+                  href="https://github.com/rzlfathurrahman/tortucord"
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-white transition"
                 >
-                  Discord Community
+                  GitHub Repository
                 </a>
               </li>
               <li>
                 <a
-                  href={APP_CONFIG.botInviteUrl()}
+                  href={APP_CONFIG.patreonUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-white transition"
+                  className="hover:text-rose-400 transition"
                 >
-                  Invite to Server
+                  Patreon Support
                 </a>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-white transition">
-                  Management Dashboard
-                </Link>
+                <a
+                  href={APP_CONFIG.kofiUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-amber-400 transition"
+                >
+                  Ko-fi Tip
+                </a>
+              </li>
+              <li>
+                <a
+                  href={APP_CONFIG.saweriaUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-amber-300 transition"
+                >
+                  Saweria (QRIS / E-Wallet)
+                </a>
               </li>
             </ul>
           </div>
