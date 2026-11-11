@@ -1,0 +1,27 @@
+{
+  "name": "tortuga",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Open-Source Discord Bot & Web Dashboard clone of Carl-bot with full premium features",
+  "author": "Open Source Community",
+  "license": "MIT",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "db:generate": "pnpm --filter @tortuga/database generate",
+    "db:push": "pnpm --filter @tortuga/database push",
+    "db:studio": "pnpm --filter @tortuga/database studio",
+    "deploy:dev": "bash scripts/deploy.sh",
+    "deploy:macmini": "bash scripts/deploy-macmini.sh",
+    "mcp": "pnpm --filter @tortuga/mcp start"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "prettier": "^3.5.2",
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.3"
+  },
+  "packageManager": "pnpm@10.20.0"
+}

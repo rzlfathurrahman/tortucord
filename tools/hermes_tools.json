@@ -1,0 +1,497 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_system_status",
+        "description": "Get real-time operational status of Tortuga Discord bot, PostgreSQL database, and system metrics",
+        "parameters": {
+          "~standard": {
+            "vendor": "zod",
+            "version": 1
+          },
+          "def": {
+            "type": "object",
+            "shape": {}
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_list_guilds",
+        "description": "List all Discord servers (guilds) managed by Tortuga bot with member count and prefix",
+        "parameters": {
+          "~standard": {
+            "vendor": "zod",
+            "version": 1
+          },
+          "def": {
+            "type": "object",
+            "shape": {}
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_get_guild_config",
+        "description": "Retrieve full configuration for a specific guild (prefix, automod, leveling, logging, starboard)",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_update_guild_settings",
+        "description": "Update general settings for a guild (prefix, locale, muted role, disabled commands)",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_list_channels",
+        "description": "List all channels in a guild (text, voice, categories, announcements, threads)",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_create_channel",
+        "description": "Create a new Discord channel or category in a guild",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_delete_channel",
+        "description": "Delete a Discord channel from a guild",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_send_message",
+        "description": "Send a message or embed announcement to a Discord channel",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_purge_messages",
+        "description": "Bulk delete up to 100 messages in a channel (with optional author filter)",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_list_roles",
+        "description": "List all roles in a guild with hierarchy position, permissions, and color",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_manage_member_role",
+        "description": "Assign or remove a role to/from a guild member",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_moderate_member",
+        "description": "Execute a moderation action against a member (WARN, TIMEOUT, KICK, BAN) and log an infraction case",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_list_infractions",
+        "description": "Retrieve moderation infractions and case history for a guild or specific user",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_get_audit_logs",
+        "description": "Query security, moderation, and guild events from Tortuga weblog ledger",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_get_automod_rules",
+        "description": "Inspect Anti-Spam, Anti-Invite, Anti-Link, and Drama Watcher rules for a guild",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_update_automod_rules",
+        "description": "Update Anti-Spam, Anti-Invite, and banned words rules for a guild",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_search_knowledge",
+        "description": "Search the Hermes AI Knowledge Base for documents, FAQs, and server guidelines",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_add_knowledge_doc",
+        "description": "Add or update an article in the Hermes AI server Knowledge Base",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tortuga_list_tickets",
+        "description": "List support tickets for a guild",
+        "parameters": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      }
+    }
+  ]
+}

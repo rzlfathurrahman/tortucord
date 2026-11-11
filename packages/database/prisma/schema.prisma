@@ -1,0 +1,701 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReactionRoleType {
+  NORMAL
+  UNIQUE
+  VERIFY
+  REVERSE
+  BINDING
+  DROP
+  LIMIT
+}
+
+enum AutomodAction {
+  WARN
+  TIMEOUT
+  MUTE
+  KICK
+  BAN
+  DELETE_MESSAGE
+}
+
+enum SuggestionStatus {
+  PENDING
+  APPROVED
+  DENIED
+  CONSIDERED
+}
+
+enum InfractionAction {
+  WARN
+  TIMEOUT
+  MUTE
+  KICK
+  BAN
+  UNBAN
+  UNMUTE
+}
+
+model Guild {
+  id                String    @id // Discord Guild Snowflake
+  prefix            String    @default("!")
+  locale            String    @default("en-US")
+  premium           Boolean   @default(false)
+  premiumTier       Int       @default(0)
+  premiumExpiresAt  DateTime?
+  disabledCommands  String[]  @default([])
+  disabledChannels  String[]  @default([])
+  mutedRoleId       String?
+  autoroleIds       String[]  @default([])
+  botAutoroleIds    String[]  @default([])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  reactionRoleGroups ReactionRoleGroup[]
+  levelingConfig     LevelingConfig?
+  userGuildXps       UserGuildXp[]
+  stickyMessages     StickyMessage[]
+  automodConfig      AutomodConfig?
+  infractions        Infraction[]
+  starboardConfig    StarboardConfig?
+  starboardMessages  StarboardMessage[]
+  suggestions        Suggestion[]
+  loggingConfig      LoggingConfig?
+  weblogEntries      WeblogEntry[]
+  customCommands     CustomCommand[]
+  onboardingConfig   OnboardingConfig?
+  inboundWebhooks    InboundWebhook[]
+  botWatcherConfig   BotWatcherConfig?
+  ticketConfig       TicketConfig?
+  tickets            Ticket[]
+  scheduledMessages  ScheduledMessage[]
+  dashboardAccesses  GuildDashboardAccess[]
+  serverSnapshots    ServerSnapshot[]
+  actionWorkflows    ActionWorkflow[]
+  knowledgeDocs      KnowledgeDoc[]
+  knowledgeConfig    KnowledgeConfig?
+  standupConfig      StandupConfig?
+  internRegistrations InternRegistration[]
+
+  @@map("guilds")
+}
+
+model ReactionRoleGroup {
+  id         String            @id @default(cuid())
+  guildId    String
+  channelId  String
+  messageId  String
+  type       ReactionRoleType  @default(NORMAL)
+  maxRoles   Int               @default(0)
+  timedHours Int               @default(0)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  items ReactionRoleItem[]
+  guild Guild              @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId])
+  @@index([messageId])
+  @@map("reaction_role_groups")
+}
+
+model ReactionRoleItem {
+  id        String   @id @default(cuid())
+  groupId   String
+  emoji     String
+  roleId    String
+  style     String?
+  label     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  group ReactionRoleGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, emoji])
+  @@index([roleId])
+  @@map("reaction_role_items")
+}
+
+model LevelingConfig {
+  guildId          String   @id
+  enabled          Boolean  @default(false)
+  xpRateMultiplier Float    @default(1.0)
+  levelUpChannelId String?
+  levelUpMessage   String?  @default("Congratulations {user.mention}, you leveled up to **level {level}**!")
+  minXpPerMsg      Int      @default(15)
+  maxXpPerMsg      Int      @default(25)
+  cooldownSec      Int      @default(60)
+  noXpChannels     String[] @default([])
+  noXpRoles        String[] @default([])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  rewards LevelReward[]
+  guild   Guild         @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@map("leveling_configs")
+}
+
+model LevelReward {
+  id             String   @id @default(cuid())
+  configId       String
+  level          Int
+  roleId         String
+  removeOnHigher Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  config LevelingConfig @relation(fields: [configId], references: [guildId], onDelete: Cascade)
+
+  @@unique([configId, level])
+  @@map("level_rewards")
+}
+
+model UserGuildXp {
+  id            String    @id @default(cuid())
+  guildId       String
+  userId        String
+  xp            BigInt    @default(0)
+  level         Int       @default(0)
+  messagesCount Int       @default(0)
+  voiceMinutes  Int       @default(0)
+  lastMessageAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, userId])
+  @@index([guildId, xp(sort: Desc)])
+  @@index([userId])
+  @@map("user_guild_xp")
+}
+
+model StickyMessage {
+  id            String   @id @default(cuid())
+  guildId       String
+  channelId     String
+  content       String   @db.Text
+  lastMessageId String?
+  cooldownSec   Int      @default(5)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, channelId])
+  @@map("sticky_messages")
+}
+
+model AutomodConfig {
+  guildId             String        @id
+  antiSpam            Boolean       @default(false)
+  antiInvite          Boolean       @default(false)
+  antiLink            Boolean       @default(false)
+  maxMentions         Int           @default(5)
+  dramaChannelId      String?
+  logChannelId        String?
+  bannedWords         String[]      @default([])
+  whitelistRoles      String[]      @default([])
+  whitelistChannels   String[]      @default([])
+  actionOnSpam        AutomodAction @default(DELETE_MESSAGE)
+  actionOnInvite      AutomodAction @default(DELETE_MESSAGE)
+  actionOnLink        AutomodAction @default(DELETE_MESSAGE)
+  actionOnMentions    AutomodAction @default(DELETE_MESSAGE)
+  actionOnBannedWords AutomodAction @default(DELETE_MESSAGE)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@map("automod_configs")
+}
+
+model Infraction {
+  id        String           @id @default(cuid())
+  guildId   String
+  caseId    Int
+  userId    String
+  modId     String
+  action    InfractionAction
+  reason    String?          @db.Text
+  expiresAt DateTime?
+  active    Boolean          @default(true)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, caseId])
+  @@index([guildId, userId])
+  @@index([userId])
+  @@map("infractions")
+}
+
+model StarboardConfig {
+  guildId         String   @id
+  enabled         Boolean  @default(false)
+  channelId       String?
+  threshold       Int      @default(3)
+  emoji           String   @default("⭐")
+  selfStar        Boolean  @default(false)
+  ignoredChannels String[] @default([])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@map("starboard_configs")
+}
+
+model StarboardMessage {
+  id                 String   @id @default(cuid())
+  guildId            String
+  originalMessageId  String
+  starboardMessageId String?
+  channelId          String
+  authorId           String
+  starCount          Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, originalMessageId])
+  @@index([guildId, channelId])
+  @@map("starboard_messages")
+}
+
+model Suggestion {
+  id               String           @id @default(cuid())
+  guildId          String
+  channelId        String
+  messageId        String?
+  authorId         String
+  suggestionNumber Int
+  suggestionText   String           @db.Text
+  status           SuggestionStatus @default(PENDING)
+  modReason        String?          @db.Text
+  modId            String?
+  upvotes          Int              @default(0)
+  downvotes        Int              @default(0)
+  upvoters         String[]         @default([])
+  downvoters       String[]         @default([])
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, suggestionNumber])
+  @@index([guildId, status])
+  @@map("suggestions")
+}
+
+model LoggingConfig {
+  guildId                String   @id
+  modLogChannelId        String?
+  messageLogChannelId    String?
+  memberLogChannelId     String?
+  serverLogChannelId     String?
+  voiceLogChannelId      String?
+  joinLeaveLogChannelId  String?
+  ignoredChannels        String[] @default([])
+  ignoredRoles           String[] @default([])
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@map("logging_configs")
+}
+
+model WeblogEntry {
+  id          String   @id @default(cuid())
+  guildId     String
+  eventType   String
+  actorId     String
+  targetId    String?
+  detailsJson Json
+  createdAt   DateTime @default(now())
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId, createdAt(sort: Desc)])
+  @@map("weblog_entries")
+}
+
+model CustomCommand {
+  id              String   @id @default(cuid())
+  guildId         String
+  name            String
+  response        String   @db.Text
+  description     String?  @default("Custom command")
+  isSlash         Boolean  @default(false)
+  aliases         String[] @default([])
+  allowedRoles    String[] @default([])
+  deniedRoles     String[] @default([])
+  allowedChannels String[] @default([])
+  deniedChannels  String[] @default([])
+  cooldownSec     Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, name])
+  @@index([guildId])
+  @@map("custom_commands")
+}
+
+model OnboardingConfig {
+  guildId          String   @id
+  welcomeEnabled   Boolean  @default(false)
+  welcomeChannelId String?
+  welcomeMessage   String?  @default("Hey {user.mention}, welcome to **{server.name}**! 🎉")
+  welcomeEmbedJson Json?
+  sendDmWelcome    Boolean  @default(false)
+  dmWelcomeMessage String?  @default("Welcome to **{server.name}**! Please check our rules and enjoy your stay.")
+  goodbyeEnabled   Boolean  @default(false)
+  goodbyeChannelId String?
+  goodbyeMessage   String?  @default("**{user.name}** has left the server. Farewell! ⛵")
+  autoroleIds      String[] @default([])
+  botAutoroleIds   String[] @default([])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_configs")
+}
+
+model InboundWebhook {
+  id              String       @id @default(cuid())
+  guildId         String
+  name            String
+  token           String       @unique @default(cuid())
+  targetChannelId String
+  provider        String       @default("generic")
+  customEmbedJson Json?
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  guild Guild        @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  logs  WebhookLog[]
+
+  @@index([guildId])
+  @@map("inbound_webhooks")
+}
+
+model WebhookLog {
+  id          String   @id @default(cuid())
+  webhookId   String
+  status      Int      @default(200)
+  sourceIp    String?
+  payloadJson Json
+  error       String?
+  createdAt   DateTime @default(now())
+
+  webhook InboundWebhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId, createdAt(sort: Desc)])
+  @@map("webhook_logs")
+}
+
+model BotWatcherConfig {
+  guildId           String    @id
+  enabled           Boolean   @default(false)
+  monitoredBotIds   String[]  @default([])
+  alertChannelId    String?
+  alertRoleIds      String[]  @default([])
+  alertCooldownMin  Int       @default(15)
+  lastAlertAt       DateTime?
+  autoThreadEnabled Boolean   @default(false)
+  botChannelIds     String[]  @default([])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@map("bot_watcher_configs")
+}
+
+model TicketConfig {
+  guildId             String   @id
+  enabled             Boolean  @default(false)
+  panelChannelId      String?
+  panelMessageId      String?
+  panelTitle          String   @default("Need Assistance? Open a Support Ticket")
+  panelDescription    String   @default("Click the button below to start a private conversation with our server staff.")
+  buttonLabel         String   @default("Open Ticket")
+  buttonEmoji         String   @default("📩")
+  ticketCategory      String?
+  supportRoleIds      String[] @default([])
+  transcriptChannelId String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@map("ticket_configs")
+}
+
+model Ticket {
+  id             String    @id @default(cuid())
+  guildId        String
+  channelId      String    @unique
+  creatorId      String
+  status         String    @default("OPEN")
+  closedBy       String?
+  closedAt       DateTime?
+  transcript     String?   @db.Text
+  summary        String?   @db.Text
+  transcriptJson Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId, status])
+  @@index([creatorId])
+  @@map("tickets")
+}
+
+model ScheduledMessage {
+  id           String    @id @default(cuid())
+  guildId      String
+  name         String
+  channelId    String
+  cronSchedule String
+  content      String    @db.Text
+  embedJson    Json?
+  enabled      Boolean   @default(true)
+  lastSentAt   DateTime?
+  nextRunAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("scheduled_messages")
+}
+
+enum DashboardRole {
+  SUPERADMIN
+  ADMIN
+  MEMBER
+}
+
+model DashboardUser {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         DashboardRole @default(MEMBER)
+  avatar       String?
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  linkedDiscordAccounts LinkedDiscordAccount[]
+  guildAccesses         GuildDashboardAccess[]
+
+  @@map("dashboard_users")
+}
+
+model LinkedDiscordAccount {
+  id           String    @id @default(cuid())
+  userId       String
+  discordId    String
+  username     String
+  globalName   String?
+  avatar       String?
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
+  connectedAt  DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user DashboardUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, discordId])
+  @@index([discordId])
+  @@map("linked_discord_accounts")
+}
+
+model GuildDashboardAccess {
+  id           String   @id @default(cuid())
+  userId       String
+  guildId      String
+  features     String[] @default([])
+  canManageAll Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user  DashboardUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guild Guild         @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, guildId])
+  @@index([userId])
+  @@index([guildId])
+  @@map("guild_dashboard_accesses")
+}
+
+model ServerSnapshot {
+  id          String   @id @default(cuid())
+  guildId     String
+  name        String
+  description String?
+  data        Json
+  createdBy   String?
+  createdAt   DateTime @default(now())
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("server_snapshots")
+}
+
+model ActionWorkflow {
+  id              String        @id @default(cuid())
+  guildId         String
+  name            String
+  description     String?
+  isActive        Boolean       @default(true)
+  triggerType     String        // MEMBER_JOIN | MEMBER_LEAVE | MESSAGE_KEYWORD | ROLE_ASSIGNED | INBOUND_WEBHOOK | TICKET_CREATED | HERMES_ALERT
+  triggerConfig   Json          // { channelId?: string, keyword?: string, roleId?: string, webhookId?: string }
+  conditionType   String        @default("ALWAYS") // ALWAYS | HAS_ROLE | DOES_NOT_HAVE_ROLE | CHANNEL_EQUALS | USER_LEVEL_GTE | KEYWORD_CONTAINS
+  conditionConfig Json?         // { roleId?: string, channelId?: string, minLevel?: number, keyword?: string }
+  actionType      String        // SEND_CHANNEL_MESSAGE | SEND_DM | ADD_ROLE | REMOVE_ROLE | CREATE_THREAD | FORWARD_WEBHOOK
+  actionConfig    Json          // { targetChannelId?: string, messageContent?: string, embedJson?: any, roleId?: string, webhookUrl?: string }
+  executionCount  Int           @default(0)
+  lastExecutedAt  DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  guild           Guild         @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  logs            WorkflowLog[]
+
+  @@index([guildId, isActive])
+  @@map("action_workflows")
+}
+
+model WorkflowLog {
+  id           String         @id @default(cuid())
+  workflowId   String
+  status       String         // SUCCESS | FAILED | SKIPPED
+  triggerEvent String
+  details      String?        @db.Text
+  executedAt   DateTime       @default(now())
+
+  workflow     ActionWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId, executedAt(sort: Desc)])
+  @@map("workflow_logs")
+}
+
+model KnowledgeDoc {
+  id          String   @id @default(cuid())
+  guildId     String
+  title       String
+  category    String   @default("General") // FAQ | Rules | SOP | Troubleshooting | Product
+  content     String   @db.Text
+  tags        String[] @default([])
+  isActive    Boolean  @default(true)
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  guild       Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId, category])
+  @@map("knowledge_docs")
+}
+
+model KnowledgeConfig {
+  guildId            String   @id
+  enabled            Boolean  @default(true)
+  autoRespondTickets Boolean  @default(true)
+  qaChannelId        String?
+  systemPrompt       String?  @db.Text
+  matchThreshold     Float    @default(0.5)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  guild              Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@map("knowledge_configs")
+}
+
+model MemberNote {
+  id        String   @id @default(cuid())
+  guildId   String
+  userId    String
+  authorId  String
+  note      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([guildId, userId])
+  @@map("member_notes")
+}
+
+model StandupConfig {
+  guildId         String    @id
+  enabled         Boolean   @default(true)
+  time            String    @default("08:30") // HH:mm in WIB (UTC+7)
+  days            Int[]     @default([1, 2, 3, 4, 5]) // 1=Mon .. 5=Fri (Senin-Jumat)
+  categoryId      String?   // Discord Category Snowflake (null = auto-detect category 'magang')
+  mentorRoleIds   String[]  @default([])
+  standupTemplate String?   @db.Text
+  deadlineTime    String    @default("10:00")
+  lastRunDate     String?   // YYYY-MM-DD
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@map("standup_configs")
+}
+
+model InternRegistration {
+  id              String    @id @default(cuid())
+  guildId         String
+  fullName        String
+  idNumber        String?   // NIS / NIM
+  school          String
+  year            Int
+  batch           String
+  division        String    // Quality Assurance, Product Manager, UI/UX Designer, Backend Developer, Frontend Developer
+  discordUserId   String?   // Discord Snowflake (if registered in discord or linked)
+  discordUsername String?   // Discord Username
+  source          String    @default("WEB") // "WEB" | "DISCORD"
+  status          String    @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
+  reviewedBy      String?   // Reviewer User ID
+  reviewerName    String?   // Reviewer Name / Tag
+  reviewedAt      DateTime?
+  rejectionReason String?
+  channelId       String?   // Discord channel
+  roleId          String?   // Assigned batch role
+  divisionRoleId  String?   // Assigned division role
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId, status])
+  @@map("intern_registrations")
+}
+
+
+

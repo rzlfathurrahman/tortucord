@@ -1,0 +1,36 @@
+{
+  "name": "@tortuga/mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) Server for Tortuga Discord Management Platform",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "tortuga-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "@tortuga/config": "workspace:*",
+    "@tortuga/database": "workspace:*",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}
