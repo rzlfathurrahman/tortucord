@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@tortuga/database';
+import { isSafeOutboundUrl } from '@/lib/security';
 import { checkFeatureAccess } from '@/lib/auth';
 import { sendChannelMessage } from '@/lib/discord';
 
@@ -54,21 +55,26 @@ export async function POST(
           executionResult = `Message dispatched to channel <#${actionConfig.targetChannelId}>`;
         }
       } else if (workflow.actionType === 'FORWARD_WEBHOOK' && actionConfig.webhookUrl) {
-        const fetchRes = await fetch(actionConfig.webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            event: 'WORKFLOW_TEST',
-            workflowId: workflow.id,
-            workflowName: workflow.name,
-            timestamp: new Date().toISOString(),
-          }),
-        });
-        if (!fetchRes.ok) {
+        if (!isSafeOutboundUrl(actionConfig.webhookUrl)) {
           status = 'FAILED';
-          executionResult = `Outbound webhook returned status ${fetchRes.status}`;
+          executionResult = 'Disallowed webhook destination: Target URL rejected by anti-SSRF security policy (Private/Internal host).';
         } else {
-          executionResult = `Payload forwarded to external webhook endpoint`;
+          const fetchRes = await fetch(actionConfig.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event: 'WORKFLOW_TEST',
+              workflowId: workflow.id,
+              workflowName: workflow.name,
+              timestamp: new Date().toISOString(),
+            }),
+          });
+          if (!fetchRes.ok) {
+            status = 'FAILED';
+            executionResult = `Outbound webhook returned status ${fetchRes.status}`;
+          } else {
+            executionResult = `Payload forwarded to external webhook endpoint`;
+          }
         }
       } else {
         executionResult = `Simulated action \`${workflow.actionType}\` verified successfully (Dry run).`;
