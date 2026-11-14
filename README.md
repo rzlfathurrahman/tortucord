@@ -143,8 +143,8 @@ TortuCord provides an all-in-one containerized deployment stack:
 
 TortuCord is an independent open-source project. If you find it valuable, support development here:
 - Patreon: [patreon.com/rzlfathurrahman](https://patreon.com/rzlfathurrahman)
-- Ko-fi: [ko-fi.com/rzlfathurrahman](https://ko-fi.com/rzlfathurrahman)
-- Saweria: [saweria.co/rzlfathurrahman](https://saweria.co/rzlfathurrahman)
+- Ko-fi: [ko-fi.com/zalon](https://ko-fi.com/zalon)
+- Saweria (QRIS / E-Wallet): [saweria.co/zalon](https://saweria.co/zalon)
 
 ---
 
