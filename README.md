@@ -3,7 +3,7 @@
 # TortuCord
 
 **Open-Source Discord Bot Platform & Web Management Dashboard**  
-*Platform otomasi Discord full-stack yang modular, modern, dan mandiri — free under MIT License.*
+*A modular, modern, full-stack Discord automation suite — free forever under the MIT License.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Discord.js](https://img.shields.io/badge/Discord.js-v14-5865F2.svg)](https://discord.js.org/)
@@ -17,50 +17,50 @@ Official Landing & Docs Repo: [rzlfathurrahman/tortucord-landing](https://github
 
 ---
 
-> Proyek ini dibangun dengan pendekatan vibecoding menggunakan Gemini AI.
+> This project was developed with a vibecoding workflow using Gemini AI.
 
 ---
 
-## Tentang TortuCord
+## About TortuCord
 
-Ekosistem Discord saat ini memiliki banyak platform hebat seperti **Carl-bot** (dikenal sangat stabil dengan manajemen reaction roles yang luas) dan **MEE6** (populer dengan onboarding, leveling gamification, dan kemudahan setup bagi komunitas besar).
+The Discord ecosystem features exceptional tools like **Carl-bot** (celebrated for its battle-tested stability and comprehensive reaction role system) and **MEE6** (widely appreciated for smooth onboarding, leveling gamification, and ease of management for large communities).
 
-TortuCord terinspirasi dari keunggulan kedua platform tersebut dan hadir sebagai alternatif **self-hosted open-source**:
-- **Kendali Penuh**: Semua data, konfigurasi, dan logs tersimpan aman di database PostgreSQL & Redis milik server sendiri.
-- **Tanpa Batasan Konfigurasi**: Bebas membuat unlimited reaction roles, welcome embeds, sticky messages, dan automod rules tanpa batasan tier.
-- **Kustomisasi Kode Bebas**: Bebas dimodifikasi, diintegrasikan dengan webhook internal, atau ditambahkan modul bot baru sesuai kebutuhan komunitas.
+TortuCord draws inspiration from the strengths of both platforms while providing a **self-hosted, open-source alternative**:
+- **Full Ownership**: All server data, logs, and configurations reside privately within your self-hosted PostgreSQL and Redis instances.
+- **Uncapped Flexibility**: Build unlimited reaction roles, welcome embeds, sticky messages, and automod rules without tier caps.
+- **Full Source Extensibility**: Fully customizable codebase with easy webhook integration and modular bot architecture.
 
-### Fitur Utama TortuCord:
-- **Auto-Role on Join**: Dukungan otomatis untuk human & bot roles.
-- **Welcome & Onboarding**: Custom embeds, welcome DM, dan live simulator.
-- **Reaction Roles**: Unlimited Emoji, Interactive Buttons, dan Select Menu dropdown.
-- **Timed Roles**: Cabut role otomatis berdasarkan durasi waktu (cooldown/trial role).
-- **Sticky Messages**: Pin pesan dinamis di multi-channel dengan TagScript parser.
-- **Leveling & Leaderboard**: XP multiplier, role rewards, dan web leaderboard.
-- **Automod & Safety**: Anti-spam Redis, link filter, toxic word dictionary, dan drama watcher.
-- **Visual Embed Builder**: Live simulator Discord pixel-perfect untuk merancang pesan komunitas.
+### Key Capabilities:
+- **Auto-Role on Join**: Seamless automated assignment for both human members and bot accounts.
+- **Welcome & Onboarding**: Custom rich embeds, personalized direct messages, and an interactive simulator.
+- **Reaction Roles**: Unlimited emoji, interactive buttons, and select dropdown menus.
+- **Timed Roles**: Auto-revoking roles based on custom durations (temporary / trial roles).
+- **Sticky Messages**: Persistent messages across multi-channels powered by an integrated TagScript parser.
+- **Leveling & Leaderboard**: Configurable XP multipliers, role rewards, and a clean web-based leaderboard.
+- **Automod & Safety**: Redis-backed spam protection, invitation filters, word blocklists, and drama surveillance.
+- **Visual Embed Builder**: Pixel-perfect Discord message simulator with live webhook dispatching.
 
 ---
 
 ## Design System
 
-Dashboard TortuCord dirancang dengan standar engineering modern:
-- Single Unified Topbar: Navigasi breadcrumb presisi (`TortuCord / [Server] / Halaman`) dengan status Gateway live dan profil Discord.
-- Dark Obsidian Canvas: Palet matte gelap (`#08090d`), layer panel terstruktur (`#0e111a`), dan border crisp `border-white/[0.08]`.
-- Pixel-Perfect Discord Simulator: Pratinjau pesan sambutan dan embed interaktif langsung sesuai tampilan client Discord asli.
+The TortuCord Dashboard is built with modern engineering principles:
+- **Single Unified Topbar**: Precise breadcrumb routing (`TortuCord / [Server] / Page`) with real-time Gateway status and user profiles.
+- **Dark Obsidian Canvas**: Deep matte palette (`#08090d`), layered panels (`#0e111a`), and subtle borders (`border-white/[0.08]`).
+- **Pixel-Perfect Discord Simulator**: Live WYSIWYG preview matching official Discord client styling.
 
 ---
 
-## Arsitektur Monorepo
+## Monorepo Architecture
 
-Repository ini memuat Engine Bot dan Web Dashboard Control Panel. Landing page & dokumentasi publik dipisahkan ke repo [`tortucord-landing`](https://github.com/rzlfathurrahman/tortucord-landing).
+This repository contains the Bot Core Engine and Web Dashboard. The public marketing landing page and docs are separated into [`tortucord-landing`](https://github.com/rzlfathurrahman/tortucord-landing).
 
 ```
 tortucord/
 ├── apps/
 │   ├── bot/                 # Discord Bot Core (Discord.js v14)
 │   │   ├── src/events/      # Gateway listeners (guildMemberAdd, reaction, voice, automod)
-│   │   ├── src/commands/    # Slash commands (/warn, /timeout, /ban, /purge, /reactionrole, dll)
+│   │   ├── src/commands/    # Slash commands (/warn, /timeout, /ban, /purge, /reactionrole, etc.)
 │   │   ├── src/modules/     # automod, leveling, reaction-roles, sticky, starboard, suggestions, tickets
 │   │   └── src/index.ts
 │   └── web/                 # Web Dashboard & Discord OAuth (Next.js 15 App Router)
@@ -77,77 +77,77 @@ tortucord/
 
 ---
 
-## Panduan Menjalankan
+## Getting Started
 
-### Cara 1: Menggunakan Docker Compose (Direkomendasikan)
+### Option 1: Docker Compose (Recommended)
 
-TortuCord menyediakan konfigurasi Docker lengkap (Postgres, Redis, Bot, dan Web Standalone):
+TortuCord provides an all-in-one containerized deployment stack:
 
-1. Clone repository dan salin environment:
+1. Clone the repository and prepare environment variables:
    ```bash
    git clone https://github.com/rzlfathurrahman/tortucord.git
    cd tortucord
    cp .env.example .env
    ```
 
-2. Isi kredensial Discord di file `.env`:
-   - `DISCORD_BOT_TOKEN`: Token bot dari Discord Developer Portal
-   - `DISCORD_CLIENT_ID`: Application ID bot
-   - `DISCORD_CLIENT_SECRET`: Client Secret bot
-   - `DISCORD_PUBLIC_KEY`: Public Key bot
+2. Populate Discord credentials in `.env`:
+   - `DISCORD_BOT_TOKEN`: Bot token from Discord Developer Portal
+   - `DISCORD_CLIENT_ID`: Application ID
+   - `DISCORD_CLIENT_SECRET`: Application Client Secret
+   - `DISCORD_PUBLIC_KEY`: Application Public Key
 
-3. Daftarkan OAuth2 Redirect URI di Discord Developer Portal:
-   - Buka Discord Developer Portal -> Pilih Bot -> OAuth2.
-   - Masukkan Redirect URI:
+3. Configure OAuth2 Redirect URI in Discord Developer Portal:
+   - Navigate to Discord Developer Portal -> Application -> OAuth2.
+   - Add Redirect URI:
      ```text
      http://localhost:3000/api/auth/discord/callback
      ```
-   - Klik Save Changes.
+   - Save changes.
 
-4. Jalankan seluruh container:
+4. Launch the stack:
    ```bash
    docker compose up -d --build
    ```
 
-5. Akses Dashboard:
-   Buka browser di [http://localhost:3000](http://localhost:3000).
+5. Access the Dashboard:
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-### Cara 2: Menjalankan Mode Development Lokal
+### Option 2: Local Development
 
-1. Install dependensi monorepo:
+1. Install monorepo dependencies:
    ```bash
    pnpm install
    ```
 
-2. Jalankan Database & Redis:
+2. Start PostgreSQL and Redis:
    ```bash
    docker compose up -d postgres redis
    ```
 
-3. Sinkronisasi Database:
+3. Synchronize database schema:
    ```bash
    pnpm --filter @tortuga/database run generate
    pnpm --filter @tortuga/database run push
    ```
 
-4. Jalankan Bot dan Web:
+4. Run the Bot and Web Dashboard:
    ```bash
    pnpm dev
    ```
 
 ---
 
-## Sponsor & Dukungan
+## Sponsorship & Support
 
-TortuCord adalah proyek open-source independen yang sepenuhnya gratis. Dukungan pengembangan dapat disalurkan melalui:
+TortuCord is an independent open-source project. If you find it valuable, support development here:
 - Patreon: [patreon.com/rzlfathurrahman](https://patreon.com/rzlfathurrahman)
 - Ko-fi: [ko-fi.com/rzlfathurrahman](https://ko-fi.com/rzlfathurrahman)
-- Saweria (QRIS / E-Wallet): [saweria.co/rzlfathurrahman](https://saweria.co/rzlfathurrahman)
+- Saweria: [saweria.co/rzlfathurrahman](https://saweria.co/rzlfathurrahman)
 
 ---
 
-## Lisensi
+## License
 
-Proyek ini dilisensikan di bawah lisensi MIT License. Bebas digunakan, dimodifikasi, dan di-hosting sendiri untuk komunitas.
+Distributed under the MIT License. Feel free to use, modify, and self-host for your community.
