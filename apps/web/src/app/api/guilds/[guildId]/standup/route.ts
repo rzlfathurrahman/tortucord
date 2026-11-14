@@ -353,7 +353,7 @@ export async function POST(
               inline: true,
             },
           ],
-          footer: { text: 'Warga Cazh • Internship Daily Routine' },
+          footer: { text: 'Community • Daily Standup' },
           timestamp: new Date().toISOString(),
         };
 
