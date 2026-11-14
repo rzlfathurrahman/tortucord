@@ -3,7 +3,7 @@
 # TortuCord
 
 **Open-Source Discord Bot Platform & Web Management Dashboard**  
-*Full-featured alternative to Carl-bot and MEE6 — zero paywalls, zero subscriptions, free forever under MIT License.*
+*Platform otomasi Discord full-stack yang modular, modern, dan mandiri — free under MIT License.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Discord.js](https://img.shields.io/badge/Discord.js-v14-5865F2.svg)](https://discord.js.org/)
@@ -21,25 +21,24 @@ Official Landing & Docs Repo: [rzlfathurrahman/tortucord-landing](https://github
 
 ---
 
-## Mengapa TortuCord?
+## Tentang TortuCord
 
-Bot populer seperti Carl-bot dan MEE6 mengunci fitur-fitur esensial komunitas di balik langganan Premium ($5 - $25/bulan) — mulai dari Auto-Role, Onboarding, Sticky Messages, Leveling, hingga Drama Watcher.
+Ekosistem Discord saat ini memiliki banyak platform hebat seperti **Carl-bot** (dikenal sangat stabil dengan manajemen reaction roles yang luas) dan **MEE6** (populer dengan onboarding, leveling gamification, dan kemudahan setup bagi komunitas besar).
 
-TortuCord hadir sebagai platform self-hostable mandiri dengan seluruh fitur terbuka penuh:
+TortuCord terinspirasi dari keunggulan kedua platform tersebut dan hadir sebagai alternatif **self-hosted open-source**:
+- **Kendali Penuh**: Semua data, konfigurasi, dan logs tersimpan aman di database PostgreSQL & Redis milik server sendiri.
+- **Tanpa Batasan Konfigurasi**: Bebas membuat unlimited reaction roles, welcome embeds, sticky messages, dan automod rules tanpa batasan tier.
+- **Kustomisasi Kode Bebas**: Bebas dimodifikasi, diintegrasikan dengan webhook internal, atau ditambahkan modul bot baru sesuai kebutuhan komunitas.
 
-| Fitur Utama | Carl-bot | MEE6 | TortuCord (Open-Source) |
-| :--- | :---: | :---: | :---: |
-| Auto-Role on Join | Limit | Berbayar ($12/bln) | Gratis & Unlimited (Human & Bot roles) |
-| Welcome & Onboarding GUI | Parsial | Sebagian Berbayar | Gratis (Embed + DM + Live Simulator) |
-| Reaction Roles | 250 limit | 250 limit | Unlimited (Emoji, Button, Select Menu) |
-| Timed Roles | $5/bln | Tidak Ada | Gratis (Cabut role otomatis setelah X jam) |
-| Sticky Messages | Max 5 channel | Tidak Ada | Unlimited Channels (Debounced anti-spam) |
-| Leveling & Leaderboard | $5/bln | Sebagian Berbayar | Gratis (XP multiplier, role reward, public web leaderboard) |
-| Drama Watcher & AutoMod | $25/bln | Berbayar | Gratis (Anti-spam Redis, anti-invite, drama review queue) |
-| Role Hierarchy GUI | Tidak Ada | Terbatas | Visual Hierarchy & Safety Check |
-| Audit Weblogs | 24 Jam | Terbatas | Permanen di PostgreSQL dengan search & filter |
-| Visual Embed Builder | Web basic | Web basic | Live Simulator (Kirim langsung ke Discord channel) |
-| Biaya Bulanan | $5 - $25/bln | $12 - $20/bln | $0 (100% Free & Open-Source) |
+### Fitur Utama TortuCord:
+- **Auto-Role on Join**: Dukungan otomatis untuk human & bot roles.
+- **Welcome & Onboarding**: Custom embeds, welcome DM, dan live simulator.
+- **Reaction Roles**: Unlimited Emoji, Interactive Buttons, dan Select Menu dropdown.
+- **Timed Roles**: Cabut role otomatis berdasarkan durasi waktu (cooldown/trial role).
+- **Sticky Messages**: Pin pesan dinamis di multi-channel dengan TagScript parser.
+- **Leveling & Leaderboard**: XP multiplier, role rewards, dan web leaderboard.
+- **Automod & Safety**: Anti-spam Redis, link filter, toxic word dictionary, dan drama watcher.
+- **Visual Embed Builder**: Live simulator Discord pixel-perfect untuk merancang pesan komunitas.
 
 ---
 
